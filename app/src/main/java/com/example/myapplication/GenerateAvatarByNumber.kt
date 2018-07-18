@@ -21,11 +21,10 @@ class GenerateAvatarByNumber {
   fun generateImage(randomNumber: Int,
                     context: Context,
                     resourceDrawable: ArrayList<Int>?): BitmapInfo {
-    var imageArrayList: ArrayList<Int>
-    if (resourceDrawable == null || resourceDrawable.size == 0) {
-      imageArrayList = getDrawableArrayList()
+    val imageArrayList: ArrayList<Int> = if (resourceDrawable == null || resourceDrawable.size == 0) {
+      getDrawableArrayList()
     } else {
-      imageArrayList = resourceDrawable
+      resourceDrawable
     }
 
     val imageMaxSize = imageArrayList.size
@@ -33,7 +32,7 @@ class GenerateAvatarByNumber {
     // 取模
     val modulusNumber = absoluteRandomNumber % imageMaxSize
 
-    val randomColor = getRandomColor(absoluteRandomNumber * 30, imageMaxSize) // 获得背景颜色
+    val randomColor = getRandomColor(absoluteRandomNumber * 30) // 获得背景颜色
 
     val iconDrawable = ContextCompat.getDrawable(context, imageArrayList[modulusNumber])
 
@@ -52,46 +51,46 @@ class GenerateAvatarByNumber {
    */
   private fun getDrawableArrayList(): ArrayList<Int> {
     val imageArrayList = ArrayList<Int>()
-    val ic_brown_bear = R.drawable.ic_brown_bear
-    val ic_cattle = R.drawable.ic_cattle
-    val ic_chicken = R.drawable.ic_chicken
-    val ic_eagle = R.drawable.ic_eagle
-    val ic_elephant = R.drawable.ic_elephant
-    val ic_elk = R.drawable.ic_elk
-    val ic_fox = R.drawable.ic_fox
-    val ic_frogrita = R.drawable.ic_frogrita
-    val ic_giraffe = R.drawable.ic_giraffe
-    val ic_hippo = R.drawable.ic_hippo
-    val ic_jaguar = R.drawable.ic_jaguar
-    val ic_koala = R.drawable.ic_koala
-    val ic_lion = R.drawable.ic_lion
-    val ic_orangutan = R.drawable.ic_orangutan
-    val ic_owl = R.drawable.ic_owl
-    val ic_penguin = R.drawable.ic_penguin
-    val ic_rabbit = R.drawable.ic_rabbit
-    val ic_raccoon = R.drawable.ic_raccoon
-    val ic_rhinoceros = R.drawable.ic_rhinoceros
-    val ic_wolf = R.drawable.ic_wolf
-    imageArrayList.add(ic_brown_bear)
-    imageArrayList.add(ic_cattle)
-    imageArrayList.add(ic_chicken)
-    imageArrayList.add(ic_eagle)
-    imageArrayList.add(ic_elephant)
-    imageArrayList.add(ic_elk)
-    imageArrayList.add(ic_fox)
-    imageArrayList.add(ic_frogrita)
-    imageArrayList.add(ic_giraffe)
-    imageArrayList.add(ic_hippo)
-    imageArrayList.add(ic_jaguar)
-    imageArrayList.add(ic_koala)
-    imageArrayList.add(ic_lion)
-    imageArrayList.add(ic_orangutan)
-    imageArrayList.add(ic_owl)
-    imageArrayList.add(ic_penguin)
-    imageArrayList.add(ic_rabbit)
-    imageArrayList.add(ic_raccoon)
-    imageArrayList.add(ic_rhinoceros)
-    imageArrayList.add(ic_wolf)
+    val icBrownBear = R.drawable.ic_brown_bear
+    val icCattle = R.drawable.ic_cattle
+    val icChicken = R.drawable.ic_chicken
+    val icEagle = R.drawable.ic_eagle
+    val icElephant = R.drawable.ic_elephant
+    val icElk = R.drawable.ic_elk
+    val icFox = R.drawable.ic_fox
+    val icFrogrita = R.drawable.ic_frogrita
+    val icGiraffe = R.drawable.ic_giraffe
+    val icHippo = R.drawable.ic_hippo
+    val icJaguar = R.drawable.ic_jaguar
+    val icKoala = R.drawable.ic_koala
+    val icLion = R.drawable.ic_lion
+    val icOrangutan = R.drawable.ic_orangutan
+    val icOwl = R.drawable.ic_owl
+    val icPenguin = R.drawable.ic_penguin
+    val icRabbit = R.drawable.ic_rabbit
+    val icRaccoon = R.drawable.ic_raccoon
+    val icRhinoceros = R.drawable.ic_rhinoceros
+    val icWolf = R.drawable.ic_wolf
+    imageArrayList.add(icBrownBear)
+    imageArrayList.add(icCattle)
+    imageArrayList.add(icChicken)
+    imageArrayList.add(icEagle)
+    imageArrayList.add(icElephant)
+    imageArrayList.add(icElk)
+    imageArrayList.add(icFox)
+    imageArrayList.add(icFrogrita)
+    imageArrayList.add(icGiraffe)
+    imageArrayList.add(icHippo)
+    imageArrayList.add(icJaguar)
+    imageArrayList.add(icKoala)
+    imageArrayList.add(icLion)
+    imageArrayList.add(icOrangutan)
+    imageArrayList.add(icOwl)
+    imageArrayList.add(icPenguin)
+    imageArrayList.add(icRabbit)
+    imageArrayList.add(icRaccoon)
+    imageArrayList.add(icRhinoceros)
+    imageArrayList.add(icWolf)
     return imageArrayList
   }
 
@@ -99,18 +98,17 @@ class GenerateAvatarByNumber {
    * @date 07\16\2018 10\08
    * @author wcx
    */
-  private fun getRandomColor(absoluteRandomNumber: Int,
-                             imageMaxSize: Int): String {
+  private fun getRandomColor(absoluteRandomNumber: Int): String {
 
     val colorAll = 171 * 6
-    val colorMax = 220;
+    val colorMax = 220
     val colorMin = 84
     //取模
     val modulusNumber = absoluteRandomNumber % colorAll
 
-    var redNextInt = colorMax;
-    var greedNextInt = colorMin;
-    var blueNextInt = colorMin;
+    var redNextInt = colorMax
+    var greedNextInt = colorMin
+    var blueNextInt = colorMin
 
     val colorArea = modulusNumber / 171
     val colorChangeAmount = modulusNumber % 171
@@ -206,16 +204,14 @@ class GenerateAvatarByNumber {
     var rectangleThirdY = 0f
     var rectangleEndY = 0f
 
-    val radius = backgroundWidth
-
     // 获得起始点所在区域
     val firstArea = (absoluteRandomNumber / 50) % 4
 
     val sin = Math.sin(Math.toRadians(20.toDouble()))
     val cos = Math.cos(Math.toRadians(20.toDouble()))
 
-    val cosWidth = (radius * cos).toFloat()
-    val sinHeight = (radius * sin).toFloat()
+    val cosWidth = (backgroundWidth * cos).toFloat()
+    val sinHeight = (backgroundWidth * sin).toFloat()
 
     val sinMobile = sinHeight / 2
     val speedMultiple = 11
