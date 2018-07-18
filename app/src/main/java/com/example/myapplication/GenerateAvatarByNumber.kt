@@ -155,8 +155,7 @@ class GenerateAvatarByNumber {
     if (blueToHexString.length < 2) {
       blueToHexString = "0$blueToHexString"
     }
-    val color = "#$redToHexString$greedToHexString$blueToHexString"
-    return color
+    return "#$redToHexString$greedToHexString$blueToHexString"
   }
 
   /**
@@ -215,8 +214,8 @@ class GenerateAvatarByNumber {
     val sin = Math.sin(Math.toRadians(20.toDouble()))
     val cos = Math.cos(Math.toRadians(20.toDouble()))
 
-    var cosWidth = (radius * cos).toFloat()
-    var sinHeight = (radius * sin).toFloat()
+    val cosWidth = (radius * cos).toFloat()
+    val sinHeight = (radius * sin).toFloat()
 
     val sinMobile = sinHeight / 2
     val speedMultiple = 11
