@@ -17,7 +17,7 @@ class MainActivity : AppCompatActivity() {
         val iv_test = findViewById<ImageView>(R.id.iv_test)
         val bt_test = findViewById<Button>(R.id.bt_test)
 
-        val randomGeneratorImage = RandomGeneratorImage()
+        val randomGeneratorImage = GenerateAvatarByNumber()
         val generateImage = randomGeneratorImage.generateImage(0, this, null)
 
         iv_test.setImageBitmap(generateImage)
