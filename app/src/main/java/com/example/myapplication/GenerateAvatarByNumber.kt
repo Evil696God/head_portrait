@@ -20,8 +20,8 @@ class GenerateAvatarByNumber {
    */
   fun generateImage(randomNumber: Int,
                     context: Context,
-                    resourceDrawable: ArrayList<Int>?): Bitmap? {
-    var imageArrayList = ArrayList<Int>()
+                    resourceDrawable: ArrayList<Int>?): BitmapInfo {
+    var imageArrayList: ArrayList<Int>
     if (resourceDrawable == null || resourceDrawable.size == 0) {
       imageArrayList = getDrawableArrayList()
     } else {
@@ -35,14 +35,15 @@ class GenerateAvatarByNumber {
 
     val randomColor = getRandomColor(absoluteRandomNumber * 30, imageMaxSize) // 获得背景颜色
 
-    var iconDrawable = ContextCompat.getDrawable(context, imageArrayList[modulusNumber])
+    val iconDrawable = ContextCompat.getDrawable(context, imageArrayList[modulusNumber])
 
     val frontBitmap = convertDrawable2BitmapByCanvas(iconDrawable!!)
 
-    val backgroundBitmap = Bitmap.createBitmap(iconDrawable!!.intrinsicWidth, iconDrawable.intrinsicHeight, Bitmap.Config.ARGB_8888)
+    val backgroundBitmap = Bitmap.createBitmap(iconDrawable.intrinsicWidth, iconDrawable.intrinsicHeight, Bitmap.Config.ARGB_8888)
     backgroundBitmap.eraseColor(Color.parseColor(randomColor))
+    val combineBitmap = combineBitmap(backgroundBitmap, frontBitmap, absoluteRandomNumber)
 
-    return combineBitmap(backgroundBitmap, frontBitmap, absoluteRandomNumber)
+    return BitmapInfo(modulusNumber, combineBitmap!!)
   }
 
   /**
@@ -50,7 +51,7 @@ class GenerateAvatarByNumber {
    * @author wcx
    */
   private fun getDrawableArrayList(): ArrayList<Int> {
-    var imageArrayList = ArrayList<Int>()
+    val imageArrayList = ArrayList<Int>()
     val ic_brown_bear = R.drawable.ic_brown_bear
     val ic_cattle = R.drawable.ic_cattle
     val ic_chicken = R.drawable.ic_chicken
@@ -367,8 +368,8 @@ class GenerateAvatarByNumber {
     canvas.drawPath(rectanglePath, paint)
 
     canvas.rotate((absoluteRandomNumber % 50).toFloat(), backgroundWidth / 2, backgroundHeight / 2)
-    canvas.drawBitmap(foreground, ((backgroundWidth - foregroundWidth) / 2).toFloat(),
-            ((backgroundHeight - foregroundHeight) / 2).toFloat(), null)
+    canvas.drawBitmap(foreground, ((backgroundWidth - foregroundWidth) / 2),
+            ((backgroundHeight - foregroundHeight) / 2), null)
     canvas.save()
     canvas.restore()
     return newmap
