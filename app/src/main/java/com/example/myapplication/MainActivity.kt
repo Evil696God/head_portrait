@@ -8,23 +8,21 @@ import android.widget.ImageView
 
 class MainActivity : AppCompatActivity() {
 
-  var testNum = 0;
+  private var testNum = 0;
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    setContentView(R.layout.activity_main)
+    this.setContentView(R.layout.activity_main)
 
-    val iv_test = findViewById<ImageView>(R.id.iv_test)
-    val bt_test = findViewById<Button>(R.id.bt_test)
+    val iv_test = this.findViewById<ImageView>(R.id.iv_test)
+    val bt_test = this.findViewById<Button>(R.id.bt_test)
 
-    val randomGeneratorImage = GenerateAvatarByNumber()
-    val generateImage = randomGeneratorImage.generateImage(0, this, null)
-
-    iv_test.setImageBitmap(generateImage.bitmap)
+    val randomGeneratorImage = GenerateAvatarByNumber(0, this, null)
+    iv_test.setImageBitmap(randomGeneratorImage.bitmap)
 
     bt_test.setOnClickListener(View.OnClickListener {
-      testNum += 1
-      val generateImage = randomGeneratorImage.generateImage(testNum, this, null)
+      this.testNum += 1
+      val generateImage = GenerateAvatarByNumber(testNum, this, null)
       iv_test.setImageBitmap(generateImage.bitmap)
     })
   }

@@ -11,16 +11,25 @@ import java.util.*
  * @author wcx
  * @description 根据输入数字随机生成图片
  */
-class GenerateAvatarByNumber {
+class GenerateAvatarByNumber(randomNumber: Int,
+                             context: Context,
+                             resourceDrawable: ArrayList<Int>?) {
+  val absoluteRandomNumber = Math.abs(randomNumber)
+  private val context = context
+  private val resourceDrawable = resourceDrawable
+  var nameMark = 0
+  var bitmap: Bitmap? = null
+
+  init {
+    generateImage()
+  }
 
   /**
    * @date 07\12\2018
    * @author wcx
    * @description 根据输入数字随机生成图片,图片集合为空则使用默认图片
    */
-  fun generateImage(randomNumber: Int,
-                    context: Context,
-                    resourceDrawable: ArrayList<Int>?): BitmapInfo {
+  private fun generateImage() {
     val imageArrayList: ArrayList<Int> = if (resourceDrawable == null || resourceDrawable.size == 0) {
       getDrawableArrayList()
     } else {
@@ -28,21 +37,26 @@ class GenerateAvatarByNumber {
     }
 
     val imageMaxSize = imageArrayList.size
-    val absoluteRandomNumber = Math.abs(randomNumber)
     // 取模
     val modulusNumber = absoluteRandomNumber % imageMaxSize
 
     val randomColor = getRandomColor(absoluteRandomNumber * 30) // 获得背景颜色
 
-    val iconDrawable = ContextCompat.getDrawable(context, imageArrayList[modulusNumber])
+    val iconDrawable = ContextCompat.getDrawable(
+            context,
+            imageArrayList[modulusNumber])
 
     val frontBitmap = convertDrawable2BitmapByCanvas(iconDrawable!!)
 
-    val backgroundBitmap = Bitmap.createBitmap(iconDrawable.intrinsicWidth, iconDrawable.intrinsicHeight, Bitmap.Config.ARGB_8888)
+    val backgroundBitmap = Bitmap.createBitmap(
+            iconDrawable.intrinsicWidth,
+            iconDrawable.intrinsicHeight,
+            Bitmap.Config.ARGB_8888)
     backgroundBitmap.eraseColor(Color.parseColor(randomColor))
-    val combineBitmap = combineBitmap(backgroundBitmap, frontBitmap, absoluteRandomNumber)
 
-    return BitmapInfo(modulusNumber, combineBitmap!!)
+    backgroundBitmap?.let { bitmap = combineBitmap(backgroundBitmap, frontBitmap) }
+
+    nameMark = modulusNumber
   }
 
   /**
@@ -99,10 +113,10 @@ class GenerateAvatarByNumber {
    * @author wcx
    */
   private fun getRandomColor(absoluteRandomNumber: Int): String {
-
-    val colorAll = 171 * 6
     val colorMax = 220
     val colorMin = 84
+    val colorDifference = colorMax - colorMin
+    val colorAll = colorDifference * 6
     //取模
     val modulusNumber = absoluteRandomNumber % colorAll
 
@@ -110,8 +124,8 @@ class GenerateAvatarByNumber {
     var greedNextInt = colorMin
     var blueNextInt = colorMin
 
-    val colorArea = modulusNumber / 171
-    val colorChangeAmount = modulusNumber % 171
+    val colorArea = modulusNumber / colorDifference
+    val colorChangeAmount = modulusNumber % colorDifference
 
     when (colorArea) {
       0 -> greedNextInt += colorChangeAmount
@@ -161,28 +175,33 @@ class GenerateAvatarByNumber {
    * @author wcx
    * @description 合成图片
    */
-  private fun combineBitmap(background: Bitmap?,
-                            foreground: Bitmap,
-                            absoluteRandomNumber: Int): Bitmap? {
-    if (background == null) {
-      return null
-    }
-    val backgroundWidth = background.width.toFloat()
+  private fun combineBitmap(
+          background: Bitmap?
+          , foreground: Bitmap): Bitmap? {
+
+    val backgroundWidth = background!!.width.toFloat()
     val backgroundHeight = background.height.toFloat()
     val foregroundWidth = foreground.width
     val foregroundHeight = foreground.height
-    val newmap = Bitmap.createBitmap(backgroundWidth.toInt(), backgroundHeight.toInt(), Bitmap.Config.ARGB_8888)
-    val canvas = Canvas(newmap)
-    canvas.drawBitmap(background, 0f, 0f, null)
+    val newmap = Bitmap.createBitmap(
+            backgroundWidth.toInt(),
+            backgroundHeight.toInt(), Bitmap.Config.ARGB_8888)
 
     // 创建画笔
-    val paint = Paint()
-    paint.color = Color.WHITE
-    val linearGradient = LinearGradient(backgroundWidth, 0f, backgroundWidth, backgroundHeight, Color.WHITE, Color.TRANSPARENT, Shader.TileMode.MIRROR)
-    paint.shader = linearGradient
-    paint.alpha = 100
-    paint.isAntiAlias = true // 设置画笔的锯齿效果
-    paint.isDither = true
+    val paint = Paint().apply {
+      color = Color.WHITE
+      shader = LinearGradient(
+              backgroundWidth,
+              0f,
+              backgroundWidth,
+              backgroundHeight,
+              Color.WHITE,
+              Color.TRANSPARENT,
+              Shader.TileMode.MIRROR)
+      isAntiAlias = true // 设置画笔的锯齿效果
+      isDither = true
+    }
+//    paint.alpha = 100
 
     // 三角形坐标
     var firstTriangleFirstX = 0f
@@ -216,157 +235,160 @@ class GenerateAvatarByNumber {
     val sinMobile = sinHeight / 2
     val speedMultiple = 11
     val coordinateMultiple = 8
-    when (firstArea) {
-      0 -> {
-        // 三角坐标
-        firstTriangleFirstX = backgroundWidth / 2 - cosWidth
-        firstTriangleFirstY = backgroundHeight / 2 - sinHeight - sinMobile
+    if (firstArea == 0 || firstArea == 2) {
+      // 三角坐标
+      firstTriangleFirstY = backgroundHeight / 2 - sinHeight - sinMobile
 
-        firstTriangleSecondX = backgroundWidth / 2 + cosWidth
-        firstTriangleSecondY = backgroundHeight / 2 + sinHeight - sinMobile
+      firstTriangleSecondX = backgroundWidth / 2 + cosWidth
+      firstTriangleSecondY = backgroundHeight / 2 + sinHeight - sinMobile
 
-        firstTriangleEndX = backgroundWidth / 2 - cosWidth
-        firstTriangleEndY = backgroundHeight / 2 + sinHeight - sinMobile
+      firstTriangleEndX = backgroundWidth / 2 - cosWidth
+      firstTriangleEndY = backgroundHeight / 2 + sinHeight - sinMobile
 
-        firstTriangleFirstY -= absoluteRandomNumber % 50 * speedMultiple / 2
-        firstTriangleEndY += absoluteRandomNumber % 50 * speedMultiple
+      firstTriangleFirstY -= absoluteRandomNumber % 50 * speedMultiple / 2
 
-        // 四边形坐标
-        rectangleFirstX = backgroundWidth / 2 - backgroundWidth / coordinateMultiple
-        rectangleFirstY = backgroundHeight / 2 - cosWidth
+      // 四边形坐标
+      rectangleFirstX = backgroundWidth / 2 - backgroundWidth / coordinateMultiple
+      rectangleFirstY = backgroundHeight / 2 - cosWidth
 
-        rectangleSecondX = backgroundWidth / 2 + backgroundWidth / coordinateMultiple
-        rectangleSecondY = backgroundHeight / 2 - cosWidth
+      rectangleSecondX = backgroundWidth / 2 + backgroundWidth / coordinateMultiple
+      rectangleSecondY = backgroundHeight / 2 - cosWidth
 
-        rectangleThirdX = backgroundWidth / 2 + backgroundWidth / coordinateMultiple
-        rectangleThirdY = backgroundHeight / 2 + cosWidth
+      rectangleThirdX = backgroundWidth / 2 + backgroundWidth / coordinateMultiple
+      rectangleThirdY = backgroundHeight / 2 + cosWidth
 
-        rectangleEndX = backgroundWidth / 2 - backgroundWidth / coordinateMultiple
-        rectangleEndY = backgroundHeight / 2 + cosWidth
+      rectangleEndX = backgroundWidth / 2 - backgroundWidth / coordinateMultiple
+      rectangleEndY = backgroundHeight / 2 + cosWidth
 
-        rectangleThirdX += absoluteRandomNumber % 50 * speedMultiple * 2
-        rectangleEndX -= absoluteRandomNumber % 50 * speedMultiple * 2
+      var factor = 1
+      when (firstArea) {
+        0 -> {
+          factor = -1
+          firstTriangleEndY += absoluteRandomNumber % 50 * speedMultiple
+
+          rectangleThirdX += absoluteRandomNumber % 50 * speedMultiple * 2
+          rectangleEndX -= absoluteRandomNumber % 50 * speedMultiple * 2
+        }
+        2 -> {
+          firstTriangleSecondY += absoluteRandomNumber % 50 * speedMultiple
+
+          rectangleFirstX -= absoluteRandomNumber % 50 * speedMultiple * 2
+          rectangleSecondX += absoluteRandomNumber % 50 * speedMultiple * 2
+        }
       }
-      1 -> {
-        // 三角坐标
-        firstTriangleFirstX = backgroundWidth / 2 - sinHeight + sinMobile
-        firstTriangleFirstY = backgroundHeight / 2 - cosWidth
+      firstTriangleFirstX = backgroundWidth / 2 + cosWidth * factor
+    } else if (firstArea == 1 || firstArea == 3) {
+      // 四边形坐标
+      rectangleFirstX = backgroundWidth / 2 - cosWidth
+      rectangleFirstY = backgroundHeight / 2 - backgroundWidth / coordinateMultiple
 
-        firstTriangleSecondX = backgroundWidth / 2 + sinHeight + sinMobile
-        firstTriangleSecondY = backgroundHeight / 2 + cosWidth
+      rectangleSecondX = backgroundWidth / 2 + cosWidth
+      rectangleSecondY = backgroundHeight / 2 - backgroundWidth / coordinateMultiple
 
-        firstTriangleEndX = backgroundWidth / 2 - sinHeight + sinMobile
-        firstTriangleEndY = backgroundHeight / 2 + cosWidth
+      rectangleThirdX = backgroundWidth / 2 + cosWidth
+      rectangleThirdY = backgroundHeight / 2 + backgroundWidth / coordinateMultiple
 
-        firstTriangleSecondX += absoluteRandomNumber % 50 * speedMultiple / 2
-        firstTriangleEndX -= absoluteRandomNumber % 50 * speedMultiple
+      rectangleEndX = backgroundWidth / 2 - cosWidth
+      rectangleEndY = backgroundHeight / 2 + backgroundWidth / coordinateMultiple
 
-        // 四边形坐标
-        rectangleFirstX = backgroundWidth / 2 - cosWidth
-        rectangleFirstY = backgroundHeight / 2 - backgroundWidth / coordinateMultiple
-
-        rectangleSecondX = backgroundWidth / 2 + cosWidth
-        rectangleSecondY = backgroundHeight / 2 - backgroundWidth / coordinateMultiple
-
-        rectangleThirdX = backgroundWidth / 2 + cosWidth
-        rectangleThirdY = backgroundHeight / 2 + backgroundWidth / coordinateMultiple
-
-        rectangleEndX = backgroundWidth / 2 - cosWidth
-        rectangleEndY = backgroundHeight / 2 + backgroundWidth / coordinateMultiple
-
-        rectangleSecondY -= absoluteRandomNumber % 50 * speedMultiple * 2
-        rectangleThirdY += absoluteRandomNumber % 50 * speedMultiple * 2
+      var factor = 1
+      when (firstArea) {
+        1 -> {
+          factor = -1
+          rectangleSecondY -= absoluteRandomNumber % 50 * speedMultiple * 2
+          rectangleThirdY += absoluteRandomNumber % 50 * speedMultiple * 2
+        }
+        3 -> {
+          rectangleFirstY -= absoluteRandomNumber % 50 * speedMultiple * 2
+          rectangleEndY += absoluteRandomNumber % 50 * speedMultiple * 2
+        }
       }
-      2 -> {
-        // 三角坐标
-        firstTriangleFirstX = backgroundWidth / 2 + cosWidth
-        firstTriangleFirstY = backgroundHeight / 2 - sinHeight - sinMobile
+      // 三角坐标
+      firstTriangleFirstX = backgroundWidth / 2 + (sinHeight - sinMobile) * factor
+      firstTriangleFirstY = backgroundHeight / 2 + cosWidth * factor
 
-        firstTriangleSecondX = backgroundWidth / 2 + cosWidth
-        firstTriangleSecondY = backgroundHeight / 2 + sinHeight - sinMobile
+      firstTriangleSecondX = backgroundWidth / 2 + (sinHeight + sinMobile) * -factor
+      firstTriangleSecondY = backgroundHeight / 2 + cosWidth * -factor
 
-        firstTriangleEndX = backgroundWidth / 2 - cosWidth
-        firstTriangleEndY = backgroundHeight / 2 + sinHeight - sinMobile
+      firstTriangleEndX = backgroundWidth / 2 + (sinHeight - sinMobile) * factor
+      firstTriangleEndY = backgroundHeight / 2 + cosWidth * -factor
 
-        firstTriangleFirstY -= absoluteRandomNumber % 50 * speedMultiple / 2
-        firstTriangleSecondY += absoluteRandomNumber % 50 * speedMultiple
-
-        // 四边形坐标
-        rectangleFirstX = backgroundWidth / 2 - backgroundWidth / coordinateMultiple
-        rectangleFirstY = backgroundHeight / 2 - cosWidth
-
-        rectangleSecondX = backgroundWidth / 2 + backgroundWidth / coordinateMultiple
-        rectangleSecondY = backgroundHeight / 2 - cosWidth
-
-        rectangleThirdX = backgroundWidth / 2 + backgroundWidth / coordinateMultiple
-        rectangleThirdY = backgroundHeight / 2 + cosWidth
-
-        rectangleEndX = backgroundWidth / 2 - backgroundWidth / coordinateMultiple
-        rectangleEndY = backgroundHeight / 2 + cosWidth
-
-        rectangleFirstX -= absoluteRandomNumber % 50 * speedMultiple * 2
-        rectangleSecondX += absoluteRandomNumber % 50 * speedMultiple * 2
-      }
-      3 -> {
-        // 三角坐标
-        firstTriangleFirstX = backgroundWidth / 2 + sinHeight - sinMobile
-        firstTriangleFirstY = backgroundHeight / 2 + cosWidth
-
-        firstTriangleSecondX = backgroundWidth / 2 - sinHeight - sinMobile
-        firstTriangleSecondY = backgroundHeight / 2 - cosWidth
-
-        firstTriangleEndX = backgroundWidth / 2 + sinHeight - sinMobile
-        firstTriangleEndY = backgroundHeight / 2 - cosWidth
-
-        firstTriangleSecondX -= absoluteRandomNumber % 50 * speedMultiple / 2
-        firstTriangleEndX += absoluteRandomNumber % 50 * speedMultiple
-
-        // 四边形坐标
-        rectangleFirstX = backgroundWidth / 2 - cosWidth
-        rectangleFirstY = backgroundHeight / 2 - backgroundWidth / coordinateMultiple
-
-        rectangleSecondX = backgroundWidth / 2 + cosWidth
-        rectangleSecondY = backgroundHeight / 2 - backgroundWidth / coordinateMultiple
-
-        rectangleThirdX = backgroundWidth / 2 + cosWidth
-        rectangleThirdY = backgroundHeight / 2 + backgroundWidth / coordinateMultiple
-
-        rectangleEndX = backgroundWidth / 2 - cosWidth
-        rectangleEndY = backgroundHeight / 2 + backgroundWidth / coordinateMultiple
-
-        rectangleFirstY -= absoluteRandomNumber % 50 * speedMultiple * 2
-        rectangleEndY += absoluteRandomNumber % 50 * speedMultiple * 2
-      }
+      firstTriangleSecondX += absoluteRandomNumber % 50 * speedMultiple / 2 * -factor
+      firstTriangleEndX += absoluteRandomNumber % 50 * speedMultiple * factor
     }
 
     // 第一个三角形
-    val firstTrianglePath = Path()
-    firstTrianglePath.moveTo(firstTriangleFirstX, firstTriangleFirstY)
-    firstTrianglePath.lineTo(firstTriangleSecondX, firstTriangleSecondY)
-    firstTrianglePath.lineTo(firstTriangleEndX, firstTriangleEndY)
-    firstTrianglePath.close()
-    canvas.rotate((absoluteRandomNumber % 50).toFloat(), backgroundWidth / 2, backgroundHeight / 2)
-    canvas.drawPath(firstTrianglePath, paint)
-
-    // 第二个三角形
-    canvas.rotate((absoluteRandomNumber % 50).toFloat() + 45, backgroundWidth / 2, backgroundHeight / 2)
-    canvas.drawPath(firstTrianglePath, paint)
+    val firstTrianglePath = Path().apply {
+      moveTo(
+              firstTriangleFirstX,
+              firstTriangleFirstY)
+      lineTo(
+              firstTriangleSecondX,
+              firstTriangleSecondY)
+      lineTo(
+              firstTriangleEndX,
+              firstTriangleEndY)
+      close()
+    }
 
     //矩形
-    val rectanglePath = Path()
-    rectanglePath.moveTo(rectangleFirstX, rectangleFirstY)
-    rectanglePath.lineTo(rectangleSecondX, rectangleSecondY)
-    rectanglePath.lineTo(rectangleThirdX, rectangleThirdY)
-    rectanglePath.lineTo(rectangleEndX, rectangleEndY)
-    rectanglePath.close()
-    canvas.rotate(-3 * (absoluteRandomNumber % 50).toFloat() - 45, backgroundWidth / 2, backgroundHeight / 2)
-    canvas.drawPath(rectanglePath, paint)
+    val rectanglePath = Path().apply {
+      moveTo(
+              rectangleFirstX,
+              rectangleFirstY)
+      lineTo(
+              rectangleSecondX,
+              rectangleSecondY)
+      lineTo(
+              rectangleThirdX,
+              rectangleThirdY)
+      lineTo(
+              rectangleEndX,
+              rectangleEndY)
+      close()
+    }
 
-    canvas.rotate((absoluteRandomNumber % 50).toFloat(), backgroundWidth / 2, backgroundHeight / 2)
-    canvas.drawBitmap(foreground, ((backgroundWidth - foregroundWidth) / 2),
-            ((backgroundHeight - foregroundHeight) / 2), null)
-    canvas.save()
-    canvas.restore()
+    Canvas(newmap).apply {
+      // 第一个三角形
+      drawBitmap(background, 0f, 0f, null)
+      rotate(
+              (absoluteRandomNumber % 50).toFloat(),
+              backgroundWidth / 2,
+              backgroundHeight / 2)
+      drawPath(
+              firstTrianglePath,
+              paint)
+
+      // 第二个三角形
+      rotate(
+              (absoluteRandomNumber % 50).toFloat() + 45,
+              backgroundWidth / 2,
+              backgroundHeight / 2)
+      drawPath(
+              firstTrianglePath,
+              paint)
+
+      // 四边形
+      rotate(
+              -3 * (absoluteRandomNumber % 50).toFloat() - 45,
+              backgroundWidth / 2,
+              backgroundHeight / 2)
+      drawPath(
+              rectanglePath,
+              paint)
+
+      rotate(
+              (absoluteRandomNumber % 50).toFloat(),
+              backgroundWidth / 2,
+              backgroundHeight / 2)
+      drawBitmap(
+              foreground,
+              ((backgroundWidth - foregroundWidth) / 2),
+              ((backgroundHeight - foregroundHeight) / 2),
+              null)
+      save()
+      restore()
+    }
     return newmap
   }
 
@@ -381,7 +403,10 @@ class GenerateAvatarByNumber {
             drawable.intrinsicHeight,
             if (drawable.opacity != PixelFormat.OPAQUE) Bitmap.Config.ARGB_8888 else Bitmap.Config.RGB_565)
     val canvas = Canvas(bitmap)
-    drawable.setBounds(0, 0, drawable.intrinsicWidth,
+    drawable.setBounds(
+            0,
+            0,
+            drawable.intrinsicWidth,
             drawable.intrinsicHeight)
     drawable.draw(canvas)
     return bitmap
