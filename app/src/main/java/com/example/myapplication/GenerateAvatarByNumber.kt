@@ -201,7 +201,6 @@ class GenerateAvatarByNumber(randomNumber: Int,
       isAntiAlias = true // 设置画笔的锯齿效果
       isDither = true
     }
-//    paint.alpha = 100
 
     // 三角形坐标
     var firstTriangleFirstX = 0f
