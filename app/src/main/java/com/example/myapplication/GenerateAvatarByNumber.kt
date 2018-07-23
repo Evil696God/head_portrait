@@ -7,7 +7,7 @@ import android.support.v4.content.ContextCompat
 import java.util.*
 
 /**
- * @data 07\12\2018 18\56
+ * @data 07/12/2018 18/56
  * @author wcx
  * @description 根据输入数字随机生成图片
  */
@@ -25,7 +25,7 @@ class GenerateAvatarByNumber(randomNumber: Int,
   }
 
   /**
-   * @date 07\12\2018
+   * @date 07/12/2018
    * @author wcx
    * @description 根据输入数字随机生成图片,图片集合为空则使用默认图片
    */
@@ -109,7 +109,7 @@ class GenerateAvatarByNumber(randomNumber: Int,
   }
 
   /**
-   * @date 07\16\2018 10\08
+   * @date 07/16/2018 10/08
    * @author wcx
    */
   private fun getRandomColor(absoluteRandomNumber: Int): String {
@@ -171,7 +171,7 @@ class GenerateAvatarByNumber(randomNumber: Int,
   }
 
   /**
-   * @date 07\12\2018 16\40
+   * @date 07/12/2018 16/40
    * @author wcx
    * @description 合成图片
    */
@@ -392,7 +392,7 @@ class GenerateAvatarByNumber(randomNumber: Int,
   }
 
   /**
-   * @date 07\12\2018 16\40
+   * @date 07/12/2018 16/40
    * @author wcx
    * @description 根据资源文件获取bitmap
    */
